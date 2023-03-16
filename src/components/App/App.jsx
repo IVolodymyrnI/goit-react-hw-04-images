@@ -12,7 +12,7 @@ export class App extends PureComponent {
   };
 
   onSearch = ({ image }) => {
-    if (image.trim() === '') {
+    if (!image.trim()) {
       toast.info('Please, enter the text');
       return;
     }
