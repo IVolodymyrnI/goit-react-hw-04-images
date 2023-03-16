@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import {
   SearchFormInput,
   SearchFormButton,
-  SearchFormButtonLabel,
+  SearchIcon,
   SearchForm,
   SearchbarStyle,
 } from './SearchbarStyle';
@@ -21,7 +21,7 @@ class Searchbar extends Component {
         <SearchbarStyle>
           <SearchForm>
             <SearchFormButton type="submit">
-              <SearchFormButtonLabel>Search</SearchFormButtonLabel>
+              <SearchIcon />
             </SearchFormButton>
 
             <SearchFormInput

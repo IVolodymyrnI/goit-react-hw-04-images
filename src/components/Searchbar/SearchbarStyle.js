@@ -1,5 +1,6 @@
 import { Field, Form } from 'formik';
 import styled from 'styled-components';
+import { ReactComponent as SearchSVG } from 'svg/search.svg';
 
 export const SearchbarStyle = styled.header`
   top: 0;
@@ -51,7 +52,6 @@ export const SearchFormButton = styled.button`
   width: 48px;
   height: 48px;
   border: 0;
-  background-image: url('https://image.flaticon.com/icons/svg/149/149852.svg');
   background-size: 40%;
   background-repeat: no-repeat;
   background-position: center;
@@ -60,19 +60,15 @@ export const SearchFormButton = styled.button`
   cursor: pointer;
   outline: none;
 
-	:hover {
+  :hover {
     opacity: 1;
   }
 `;
 
-export const SearchFormButtonLabel = styled.span`
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  clip-path: inset(50%);
-  border: 0;
+export const SearchIcon = styled(SearchSVG)`
+  display: block;
+  margin: auto auto;
+  fill: black;
+  width: 20px;
+  height: 20px;
 `;

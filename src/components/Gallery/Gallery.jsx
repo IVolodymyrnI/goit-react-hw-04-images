@@ -2,8 +2,8 @@ import PropTypes from 'prop-types';
 import { Component, Fragment } from 'react';
 import { toast } from 'react-toastify';
 
-import { ImageGalleryItem } from 'components/ImageGalleryItem/ImageGalleryItem';
-import { ImageGalleryStyle } from './ImageGalleryStyle';
+import { GalleryItem } from 'components/ImageGalleryItem/GalleryItem';
+import { GalleryStyle } from './GalleryStyle';
 import { API } from 'components/api/api';
 import { Modal } from 'components/Modal/Modal';
 import { Button } from 'components/Button/Button';
@@ -16,7 +16,7 @@ const status = {
   REJECT: 'reject',
 };
 
-export class ImageGallery extends Component {
+export class Gallery extends Component {
   state = {
     gallery: [],
     error: '',
@@ -101,9 +101,9 @@ export class ImageGallery extends Component {
 
     return (
       <Fragment>
-        <ImageGalleryStyle onClick={this.onImage}>
-          <ImageGalleryItem gallery={gallery} />
-        </ImageGalleryStyle>
+        <GalleryStyle onClick={this.onImage}>
+          <GalleryItem gallery={gallery} />
+        </GalleryStyle>
         {loadMore}
         {isOpenModal && (
           <Modal largeImage={largeImage} toggleModal={this.toggleModal} />
@@ -113,6 +113,6 @@ export class ImageGallery extends Component {
   }
 }
 
-ImageGallery.propTypes = {
+Gallery.propTypes = {
   search: PropTypes.string.isRequired,
 };

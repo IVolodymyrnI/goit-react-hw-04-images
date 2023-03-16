@@ -1,20 +1,21 @@
 import PropTypes from 'prop-types';
-import {
-  ImageGalleryItemImage,
-  ImageGalleryItemStyle,
-} from './ImageGalleryItemStyle';
+import { GalleryItemImage, GalleryItemStyle } from './GalleryItemStyle';
 
-export function ImageGalleryItem({ gallery }) {
+export function GalleryItem({ gallery }) {
   return gallery.map(({ id, webformatURL, tags }) => {
     return (
-      <ImageGalleryItemStyle key={id}>
-        <ImageGalleryItemImage src={webformatURL} alt={tags} id={id} />
-      </ImageGalleryItemStyle>
+      <GalleryItemStyle key={id}>
+        <GalleryItemImage
+          src={webformatURL}
+          alt={tags}
+          id={id}
+        />
+      </GalleryItemStyle>
     );
   });
 }
 
-ImageGalleryItem.propTypes = {
+GalleryItem.propTypes = {
   gallery: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,

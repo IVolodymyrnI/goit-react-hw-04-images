@@ -4,7 +4,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import { AppStyle } from './AppStyle';
 import Searchbar from 'components/Searchbar/Searchbar';
-import { ImageGallery } from 'components/ImageGallery/ImageGallery';
+import { Gallery } from 'components/Gallery/Gallery';
 
 export class App extends PureComponent {
   state = {
@@ -18,7 +18,7 @@ export class App extends PureComponent {
     }
 
     if (image === this.state.search) {
-      toast.info(`The results of search "${image}" is already displayed!`);
+      toast.info(`The results of the search "${image}" are already displayed!`);
       return;
     }
 
@@ -29,7 +29,7 @@ export class App extends PureComponent {
     return (
       <AppStyle>
         <Searchbar onSearch={this.onSearch}></Searchbar>
-        <ImageGallery search={this.state.search} />
+        <Gallery search={this.state.search} />
         <ToastContainer />
       </AppStyle>
     );
