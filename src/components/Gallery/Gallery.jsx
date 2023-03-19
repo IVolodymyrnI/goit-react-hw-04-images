@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 
 import { GalleryItem } from 'components/ImageGalleryItem/GalleryItem';
 import { GalleryStyle } from './GalleryStyle';
-import { API } from 'components/api/api';
+import { API } from 'api/api';
 import { Modal } from 'components/Modal/Modal';
 import { Button } from 'components/Button/Button';
 import { Loader } from 'components/Loader/Loader';
@@ -32,33 +32,32 @@ export class Gallery extends Component {
   onImage = e => {
     if (e.target.nodeName === 'IMG') {
       const id = e.target.id;
-      const image = this.state.gallery.find(image => image.id === id);
-      const { largeImageURL, tags } = image;
+      const largeImageObj = this.state.gallery.find(image => image.id === id);
+      const { largeImageURL, tags } = largeImageObj;
 
       this.setState({ largeImage: { largeImageURL, tags } });
       this.toggleModal();
     }
   };
 
-  onLoadMore = () => {
-    this.fetchImage(this.props.search, { onLoadMore: true });
-  };
-
   componentDidUpdate(prevProps) {
-    if (this.props.search !== prevProps.search) {
-      this.fetchImage(this.props.search);
+    const { search, page } = this.props;
+
+    if (search !== prevProps.search || page !== prevProps.page) {
+      this.fetchImage(search, page);
     }
   }
 
-  fetchImage = async (value, { onLoadMore } = false) => {
+  fetchImage = async (value, page) => {
     this.setState({ status: status.PENDING });
+    const isPageOne = page !== 1;
 
     try {
-      const response = await API.fetchImage(value, { onLoadMore });
+      const response = await API.fetchImage(value, page);
       const newImageObj = this.takeObjectPropeties(response.data.hits);
 
       this.setState(prevState => ({
-        gallery: onLoadMore
+        gallery: isPageOne
           ? [...prevState.gallery, ...newImageObj]
           : [...newImageObj],
       }));
@@ -85,6 +84,7 @@ export class Gallery extends Component {
 
   render() {
     const { gallery, largeImage, isOpenModal, status } = this.state;
+    const { onLoadMore } = this.props;
     let loadMore;
 
     if (status === 'idle' || status === 'reject') {
@@ -96,7 +96,7 @@ export class Gallery extends Component {
     }
 
     if (status === 'resolved') {
-      loadMore = <Button onLoadMore={this.onLoadMore} />;
+      loadMore = <Button onLoadMore={onLoadMore} />;
     }
 
     return (

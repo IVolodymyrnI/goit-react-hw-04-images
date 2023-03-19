@@ -9,6 +9,7 @@ import { Gallery } from 'components/Gallery/Gallery';
 export class App extends PureComponent {
   state = {
     search: '',
+    page: 1,
   };
 
   onSearch = ({ image }) => {
@@ -22,14 +23,22 @@ export class App extends PureComponent {
       return;
     }
 
-    this.setState({ search: image });
+    this.setState({ search: image, page: 1 });
   };
+
+  onLoadMore() {
+    this.setState(prevState => ({ page: prevState.page + 1 }));
+  }
 
   render() {
     return (
       <AppStyle>
         <Searchbar onSearch={this.onSearch}></Searchbar>
-        <Gallery search={this.state.search} />
+        <Gallery
+          search={this.state.search}
+          page={this.state.page}
+          onLoadMore={() => this.onLoadMore()}
+        />
         <ToastContainer />
       </AppStyle>
     );

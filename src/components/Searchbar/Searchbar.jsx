@@ -1,5 +1,4 @@
 import { Formik } from 'formik';
-import { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
   SearchFormInput,
@@ -9,33 +8,30 @@ import {
   SearchbarStyle,
 } from './SearchbarStyle';
 
-class Searchbar extends Component {
-  onSubmit = (value, { resetForm }) => {
-    this.props.onSearch(value);
-    resetForm();
+function Searchbar({ onSearch }) {
+  const onSubmit = value => {
+    onSearch(value);
   };
 
-  render() {
-    return (
-      <Formik onSubmit={this.onSubmit} initialValues={{ image: '' }}>
-        <SearchbarStyle>
-          <SearchForm>
-            <SearchFormButton type="submit">
-              <SearchIcon />
-            </SearchFormButton>
+  return (
+    <Formik onSubmit={onSubmit} initialValues={{ image: '' }}>
+      <SearchbarStyle>
+        <SearchForm>
+          <SearchFormButton type="submit">
+            <SearchIcon />
+          </SearchFormButton>
 
-            <SearchFormInput
-              type="text"
-              name="image"
-              autoComplete="off"
-              autoFocus
-              placeholder="Search images and photos"
-            />
-          </SearchForm>
-        </SearchbarStyle>
-      </Formik>
-    );
-  }
+          <SearchFormInput
+            type="text"
+            name="image"
+            autoComplete="off"
+            autoFocus
+            placeholder="Search images and photos"
+          />
+        </SearchForm>
+      </SearchbarStyle>
+    </Formik>
+  );
 }
 
 export default Searchbar;

@@ -14,8 +14,8 @@ const API = {
     orientation: 'horizontal',
   },
 
-  async fetchImage(value, onLoadMore) {
-    this.configParams(value, onLoadMore);
+  async fetchImage(value, page) {
+    this.setConfigParams(value, page);
 
     const response = await this.instance.get('/api/', {
       params: this.params,
@@ -28,22 +28,17 @@ const API = {
     return response;
   },
 
-  configParams(value, { onLoadMore } = false) {
+  setConfigParams(value, page) {
     this.setImageName(value);
-    onLoadMore ? this.increasePage() : this.resetPage();
+    this.setPage(page);
   },
 
-  increasePage() {
-    const { page: prevValue } = this.params;
-    this.params = { ...this.params, page: prevValue + 1 };
+  setPage(page) {
+    this.params = { ...this.params, page };
   },
 
-  resetPage() {
-    this.params = { ...this.params, page: 1 };
-  },
-
-  setImageName(value) {
-    this.params = { ...this.params, q: value };
+  setImageName(q) {
+    this.params = { ...this.params, q };
   },
 };
 
