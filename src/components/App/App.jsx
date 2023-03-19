@@ -108,7 +108,7 @@ export class App extends PureComponent {
     let loadMore;
 
     if (status === 'idle' || status === 'reject') {
-      loadMore = '';
+      loadMore = null;
     }
 
     if (status === 'pending') {
