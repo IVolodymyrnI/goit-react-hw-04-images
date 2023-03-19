@@ -8,7 +8,7 @@ import {
   SearchbarStyle,
 } from './SearchbarStyle';
 
-function Searchbar({ onSearch }) {
+export function Searchbar({ onSearch }) {
   const onSubmit = value => {
     onSearch(value);
   };
@@ -33,8 +33,6 @@ function Searchbar({ onSearch }) {
     </Formik>
   );
 }
-
-export default Searchbar;
 
 Searchbar.propTypes = {
   onSearch: PropTypes.func.isRequired,
