@@ -1,26 +1,16 @@
 import PropTypes from 'prop-types';
 import { GalleryItemImage, GalleryItemStyle } from './GalleryItemStyle';
 
-export function GalleryItem({ gallery }) {
-  return gallery.map(({ id, webformatURL, tags }) => {
-    return (
-      <GalleryItemStyle key={id}>
-        <GalleryItemImage
-          src={webformatURL}
-          alt={tags}
-          id={id}
-        />
-      </GalleryItemStyle>
-    );
-  });
+export function GalleryItem({ webformatURL, tags, id }) {
+  return (
+    <GalleryItemStyle>
+      <GalleryItemImage src={webformatURL} alt={tags} id={id} />
+    </GalleryItemStyle>
+  );
 }
 
 GalleryItem.propTypes = {
-  gallery: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      webformatURL: PropTypes.string.isRequired,
-      tags: PropTypes.string.isRequired,
-    })
-  ),
+  id: PropTypes.number.isRequired,
+  webformatURL: PropTypes.string.isRequired,
+  tags: PropTypes.string.isRequired,
 };

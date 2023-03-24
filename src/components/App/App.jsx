@@ -1,4 +1,4 @@
-import { PureComponent } from 'react';
+import { useEffect, useReducer } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -8,127 +8,118 @@ import { Searchbar } from 'components/Searchbar/Searchbar';
 import { Gallery } from 'components/Gallery/Gallery';
 import { API } from 'api/api';
 import { Button } from 'components/Button/Button';
-import { Loader } from 'components/Loader/Loader';
+import { type, status } from 'constants';
 
-const status = {
-  IDLE: 'idle',
-  PENDING: 'pending',
-  RESOLVED: 'resolved',
-  REJECT: 'reject',
-};
+const {
+  SEARCH,
+  INIT_PAGE,
+  NEXT_PAGE,
+  TOGGLE_MODAL,
+  STATUS,
+  MODAL_PHOTO,
+  GALLERY,
+} = type;
+const { REJECTED, RESOLVED, PENDING, IDLE } = status;
 
-export class App extends PureComponent {
-  state = {
+export const App = () => {
+  const [state, dispatch] = useReducer(reducer, {
     search: '',
     page: 1,
-    error: '',
     gallery: [],
     isOpenModal: false,
-    largeImage: {},
-    status: status.IDLE,
-  };
+    modalPhoto: {},
+    status: IDLE,
+  });
+  const { search, page, gallery, isOpenModal, modalPhoto, status } = state;
 
-  onSearch = ({ image }) => {
+  const onSearch = ({ image }) => {
     if (!image.trim()) {
       toast.info('Please, enter the text');
       return;
     }
 
-    if (image === this.state.search) {
+    if (image === search) {
       toast.info(`The results of the search "${image}" are already displayed!`);
       return;
     }
 
-    this.setState({ search: image, page: 1 });
+    dispatch({ type: SEARCH, payload: image });
+    dispatch({ type: INIT_PAGE, payload: 1 });
+    dispatch({ type: GALLERY, payload: [] });
   };
 
-  onLoadMore = () => {
-    this.setState(prevState => ({ page: prevState.page + 1 }));
+  const onLoadMore = () => {
+    dispatch({ type: NEXT_PAGE, payload: 1 });
   };
 
-  toggleModal = () => {
-    this.setState(prevState => ({ isOpenModal: !prevState.isOpenModal }));
+  const toggleModal = () => {
+    dispatch({ type: TOGGLE_MODAL });
   };
 
-  onImage = e => {
-    if (e.target.nodeName === 'IMG') {
-      const id = e.target.id;
-      const largeImageObj = this.state.gallery.find(image => image.id === id);
-      const { largeImageURL, tags } = largeImageObj;
+  useEffect(() => {
+    if (!search) {
+      return;
+    }
 
-      this.setState({ largeImage: { largeImageURL, tags } });
-      this.toggleModal();
+    dispatch({ type: STATUS, payload: PENDING });
+    API.fetchImage(search, page)
+      .then(r => {
+        const images = r.data.hits;
+
+        dispatch({ type: GALLERY, payload: images });
+        dispatch({ type: STATUS, payload: RESOLVED });
+      })
+      .catch(e => {
+        toast.error(e.message);
+        dispatch({ type: STATUS, payload: REJECTED });
+      });
+  }, [search, page]);
+
+  const onImage = ({ target: { nodeName, id } }) => {
+    if (nodeName === 'IMG') {
+      const modalPhoto = gallery.find(image => image.id === Number(id));
+
+      dispatch({ type: MODAL_PHOTO, payload: modalPhoto });
+      toggleModal();
     }
   };
 
-  componentDidUpdate(_, prevState) {
-    const { search, page } = this.state;
+  return (
+    <AppStyle>
+      <Searchbar onSearch={onSearch}></Searchbar>
+      <Gallery gallery={gallery} onImage={onImage} />
+      <Button onLoadMore={onLoadMore} status={status} />
+      {isOpenModal && (
+        <Modal modalPhoto={modalPhoto} toggleModal={toggleModal} />
+      )}
+      <ToastContainer />
+    </AppStyle>
+  );
+};
 
-    if (search !== prevState.search || page !== prevState.page) {
-      this.fetchImage(search, page);
-    }
-  }
-
-  fetchImage = async (value, page) => {
-    this.setState({ status: status.PENDING });
-    const isPageOne = page !== 1;
-
-    try {
-      const response = await API.fetchImage(value, page);
-      const newImageObj = this.takeObjectPropeties(response.data.hits);
-
-      this.setState(prevState => ({
-        gallery: isPageOne
-          ? [...prevState.gallery, ...newImageObj]
-          : [...newImageObj],
-      }));
-
-      this.setState({ status: status.RESOLVED });
-    } catch (error) {
-      toast.error(error.message);
-      this.setState({ status: status.REJECT });
-    }
-  };
-
-  takeObjectPropeties = data => {
-    return data.map(({ id, webformatURL, largeImageURL, tags }) => {
-      const stringifiedId = String(id);
-
+const reducer = (state, action) => {
+  switch (action.type) {
+    case SEARCH:
+      return { ...state, search: action.payload };
+    case INIT_PAGE:
+      return { ...state, page: action.payload };
+    case NEXT_PAGE:
+      return { ...state, page: state.page + action.payload };
+    case TOGGLE_MODAL:
+      return { ...state, isOpenModal: !state.isOpenModal };
+    case STATUS:
+      return { ...state, status: action.payload };
+    case MODAL_PHOTO:
+      return { ...state, modalPhoto: action.payload };
+    case GALLERY:
       return {
-        id: stringifiedId,
-        webformatURL,
-        largeImageURL,
-        tags,
+        ...state,
+        gallery:
+          state.page === 1
+            ? action.payload
+            : [...state.gallery, ...action.payload],
       };
-    });
-  };
-
-  render() {
-    const { largeImage, isOpenModal, gallery, status } = this.state;
-    let loadMore;
-
-    if (status === 'idle' || status === 'reject') {
-      loadMore = null;
-    }
-
-    if (status === 'pending') {
-      loadMore = <Loader />;
-    }
-
-    if (status === 'resolved') {
-      loadMore = <Button onLoadMore={this.onLoadMore} />;
-    }
-
-    return (
-      <AppStyle>
-        <Searchbar onSearch={this.onSearch}></Searchbar>
-        <Gallery gallery={gallery} onImage={this.onImage} />
-        {loadMore}
-        {isOpenModal && (
-          <Modal largeImage={largeImage} toggleModal={this.toggleModal} />
-        )}
-        <ToastContainer />
-      </AppStyle>
-    );
+    default:
+      return state;
   }
-}
+};
