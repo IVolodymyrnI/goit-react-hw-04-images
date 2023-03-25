@@ -2,7 +2,6 @@ import { useEffect, useReducer } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import { Modal } from 'components/Modal/Modal';
 import { AppStyle } from './AppStyle';
 import { Searchbar } from 'components/Searchbar/Searchbar';
 import { Gallery } from 'components/Gallery/Gallery';
@@ -14,9 +13,7 @@ const {
   SEARCH,
   INIT_PAGE,
   NEXT_PAGE,
-  TOGGLE_MODAL,
   STATUS,
-  MODAL_PHOTO,
   GALLERY,
 } = type;
 const { REJECTED, RESOLVED, PENDING, IDLE } = status;
@@ -26,11 +23,9 @@ export const App = () => {
     search: '',
     page: 1,
     gallery: [],
-    isOpenModal: false,
-    modalPhoto: {},
     status: IDLE,
   });
-  const { search, page, gallery, isOpenModal, modalPhoto, status } = state;
+  const { search, page, gallery, status } = state;
 
   const onSearch = ({ image }) => {
     if (!image.trim()) {
@@ -52,10 +47,6 @@ export const App = () => {
     dispatch({ type: NEXT_PAGE, payload: 1 });
   };
 
-  const toggleModal = () => {
-    dispatch({ type: TOGGLE_MODAL });
-  };
-
   useEffect(() => {
     if (!search) {
       return;
@@ -75,49 +66,30 @@ export const App = () => {
       });
   }, [search, page]);
 
-  const onImage = ({ target: { nodeName, id } }) => {
-    if (nodeName === 'IMG') {
-      const modalPhoto = gallery.find(image => image.id === Number(id));
-
-      dispatch({ type: MODAL_PHOTO, payload: modalPhoto });
-      toggleModal();
-    }
-  };
-
   return (
     <AppStyle>
       <Searchbar onSearch={onSearch}></Searchbar>
-      <Gallery gallery={gallery} onImage={onImage} />
+      <Gallery gallery={gallery} />
       <Button onLoadMore={onLoadMore} status={status} />
-      {isOpenModal && (
-        <Modal modalPhoto={modalPhoto} toggleModal={toggleModal} />
-      )}
       <ToastContainer />
     </AppStyle>
   );
 };
 
-const reducer = (state, action) => {
-  switch (action.type) {
+const reducer = (state, { type, payload }) => {
+  switch (type) {
     case SEARCH:
-      return { ...state, search: action.payload };
+      return { ...state, search: payload };
     case INIT_PAGE:
-      return { ...state, page: action.payload };
+      return { ...state, page: payload };
     case NEXT_PAGE:
-      return { ...state, page: state.page + action.payload };
-    case TOGGLE_MODAL:
-      return { ...state, isOpenModal: !state.isOpenModal };
+      return { ...state, page: state.page + payload };
     case STATUS:
-      return { ...state, status: action.payload };
-    case MODAL_PHOTO:
-      return { ...state, modalPhoto: action.payload };
+      return { ...state, status: payload };
     case GALLERY:
       return {
         ...state,
-        gallery:
-          state.page === 1
-            ? action.payload
-            : [...state.gallery, ...action.payload],
+        gallery: state.page === 1 ? payload : [...state.gallery, ...payload],
       };
     default:
       return state;
